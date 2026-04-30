@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EREN · AI EDGERUNNER</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ GLOBAL OVERLAYS -->
+<canvas id="grain"></canvas>
+<div id="scanlines"></div>
+<div id="insomnia-overlay"></div>
+<div id="vhs-overlay"><span id="vhs-text">&gt; SWITCHING TAPE...</span></div>
+
+<!-- CUSTOM CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="cursor-label"></div>
+
+<!-- IDLE OVERLAY -->
+<div id="idle-overlay">
+  <div id="idle-datetime"></div>
+  <div>STILL THERE? [press any key]</div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div id="video-modal" role="dialog" aria-label="Video player">
+  <div class="modal-letterbox">
+    <span>[ × CLOSE ]</span>
+  </div>
+  <video id="modal-video" class="modal-video" controls playsinline></video>
+  <div class="modal-letterbox"></div>
+</div>
+
+<!-- QR MODAL -->
+<div id="qr-modal" role="dialog" aria-label="WeChat QR Code">
+  <div class="qr-box">
+    <img src="uploads/二维码.jpg" alt="微信二维码" style="width:220px;height:220px;object-fit:contain;display:block;">
+    <div class="qr-label">&gt; SCAN TO ADD WECHAT</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ LOADING SCREEN -->
+<div id="loading-screen" aria-live="polite">
+  <div class="loading-letterbox top"></div>
+  <div class="loading-terminal">
+    <div>EREN.OS &nbsp; v2.0.26</div>
+    <div id="loading-bar-line">LOADING &nbsp; <span id="loading-bar" class="loading-bar-track">░░░░░░░░░░</span> &nbsp; <span id="loading-pct">0%</span></div>
+    <div id="loading-timer">[00:00:00.000]</div>
+  </div>
+  <div class="loading-skip">— press any key to skip —</div>
+  <div class="loading-letterbox bottom"></div>
+</div>
+
+<!-- ══════════════════════════════════════════ SITE -->
+<div id="site">
+
+  <!-- TOPBAR -->
+  <nav id="topbar" aria-label="Site navigation">
+    <div class="topbar-left mono">&lt;— REW</div>
+    <div class="topbar-right">
+      <div style="position:relative;">
+        <button class="topbar-btn" id="menu-btn" aria-haspopup="true" aria-expanded="false">MENU</button>
+        <div id="menu-dropdown" role="menu">
+          <a href="#hero" role="menuitem">HOME</a>
+          <a href="#skills" role="menuitem">SKILLS</a>
+          <a href="#portfolio" role="menuitem">WORKS</a>
+          <a href="#videos" role="menuitem">VIDEO</a>
+        </div>
+      </div>
+      <a href="visitor-log.html" id="visitor-log-btn" class="topbar-btn">VISITOR LOG</a>
+    </div>
+  </nav>
+
+  <!-- ═══ SECTION 2 · HERO -->
+  <section id="hero" data-screen-label="Hero">
+    <div class="hero-bg"></div>
+    <!-- Wireframe Prism -->
+    <div class="hero-prism" aria-hidden="true">
+      <svg viewBox="0 0 300 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- outer triangle -->
+        <polygon points="150,20 290,240 10,240" stroke="#3DFF8F" stroke-width="1.5" fill="none" opacity="0.9"/>
+        <!-- inner structure -->
+        <line x1="150" y1="20" x2="150" y2="240" stroke="#3DFF8F" stroke-width="1" opacity="0.5" stroke-dasharray="4 4"/>
+        <line x1="10" y1="240" x2="220" y2="130" stroke="#3DFF8F" stroke-width="1" opacity="0.5" stroke-dasharray="4 4"/>
+        <line x1="290" y1="240" x2="80" y2="130" stroke="#3DFF8F" stroke-width="1" opacity="0.5" stroke-dasharray="4 4"/>
+        <!-- inner triangle -->
+        <polygon points="150,80 240,220 60,220" stroke="#3DFF8F" stroke-width="1" fill="none" opacity="0.5"/>
+        <!-- nodes -->
+        <circle cx="150" cy="20" r="5" fill="#3DFF8F"/>
+        <circle cx="290" cy="240" r="4" fill="#FF2E63"/>
+        <circle cx="10" cy="240" r="4" fill="#FFB627"/>
+        <circle cx="150" cy="240" r="3" fill="#00E5FF"/>
+        <circle cx="220" cy="130" r="3" fill="#FF00E5"/>
+        <circle cx="80" cy="130" r="3" fill="#3DFF8F" opacity="0.7"/>
+        <!-- animated dash -->  
+        <polygon points="150,20 290,240 10,240" stroke="#3DFF8F" stroke-width="1.5" fill="none" opacity="0.4"
+          stroke-dasharray="12 8"
+          style="animation: dash-run 3s linear infinite;"/>
+      </svg>
+    </div>
+    <!-- Orbit rings decoration -->
+    <div class="orbit-wrap" style="top:15%;left:5%;width:120px;height:120px;" aria-hidden="true">
+      <div class="orbit-ring" style="width:80px;height:80px;animation:spin 12s linear infinite;"></div>
+      <div class="orbit-ring" style="width:120px;height:120px;animation:spin 20s linear infinite reverse;opacity:0.5;"></div>
+      <div class="geo-node green" style="width:6px;height:6px;top:8px;left:50%;"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title" id="hero-title" aria-label="The world AI represents Everything!">
+        <span id="ht-line1"></span>
+        <span id="ht-line2"></span>
+        <span id="ht-line3"></span>
+      </h1>
+      <div class="hero-subtitle" id="hero-subtitle">
+        <div class="hero-sub-en">-Wait, don't go yet-</div>
+        <div class="hero-sub-zh">先 · 别 · 滑 · 走</div>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+      <div class="hero-scroll-label">scroll, slowly</div>
+    </div>
+  </section>
+
+  <!-- MARQUEE TICKER -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-item">AI TRAINER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">SHORT-VIDEO DIRECTOR</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">GRAPHIC DESIGNER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">AI EDGERUNNER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">EREN · 2026</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">AI TRAINER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">SHORT-VIDEO DIRECTOR</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">GRAPHIC DESIGNER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">AI EDGERUNNER</span><span class="marquee-item accent">✦</span>
+      <span class="marquee-item">EREN · 2026</span><span class="marquee-item accent">✦</span>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 3 · ABOUT ME -->
+  <section id="about" data-screen-label="About Me">
+    <div class="ghost-text" aria-hidden="true">ABOUT ME</div>
+    <div class="about-title-block" style="position:relative;z-index:1;">
+      <h2 class="about-title">ABOUT ME</h2>
+      <div class="about-title-zh">关 · 于 · 我</div>
+    </div>
+    <div class="about-rec" aria-label="Recording indicator">
+      <span class="rec-dot"></span>
+      <span>▲ REC &nbsp;</span>
+      <span id="rec-timer">00:00:00</span>
+    </div>
+    <div class="about-body" id="about-body" aria-label="About Eren"></div>
+  </section>
+
+  <!-- ═══ SECTION 4 · PHOTO MASK -->
+  <section id="photo-mask" data-screen-label="Photo">
+    <div class="photo-sticky">
+      <div class="photo-container">
+        <img class="photo-img photo-1" src="assets/photo1.jpg" alt="Eren 个人照片" style="object-position:center top;">
+        <img class="photo-img photo-2" id="photo2" src="assets/photo2.jpg" alt="Eren AI 赛博版" style="object-position:center top;clip-path:polygon(0 100%, 100% 100%, 100% 100%, 0 100%);">
+        <div class="photo-progress-bar" aria-hidden="true">
+          <div class="photo-progress-fill" id="photo-fill"></div>
+        </div>
+      </div>
+      <div class="photo-progress-label" id="photo-label">TRANSFORMING... 0%</div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 5 · SKILLS -->
+  <section id="skills" data-screen-label="Skills">
+    <div class="section-strip">&gt; SECT 05 / SKILLS</div>
+
+    <!-- Skills Intro Header -->
+    <div class="skills-intro">
+      <div class="skills-intro-eyebrow">— CAPABILITIES —</div>
+      <h2 class="skills-intro-title">WHAT SKILLS<br><span class="si-em">CAN I HAVE</span><span class="si-q">?</span></h2>
+      <div class="skills-intro-sub">三项核心能力 · Three Core Skills</div>
+    </div>
+
+    <!-- Skill 01 · AI Trainer -->
+    <div class="skill-item" data-index="0">
+      <div class="skill-item-left">
+        <div class="skill-im-a">I'M A</div>
+        <h2 class="skill-name-big">AI<br>TRAINER</h2>
+        <div class="skill-tag-zh">（AI 训练赋能）</div>
+        <p class="skill-desc-line">爱调教一些奇奇怪怪的 AI</p>
+        <div class="skill-big-num">01</div>
+      </div>
+      <div class="skill-item-right">
+        <div class="skill-visual">
+          <div class="sv-terminal">
+            <div class="sv-terminal-bar"><span></span><span></span><span></span></div>
+            <div class="sv-terminal-body">
+              <div class="sv-line"><span class="sv-prompt">▸</span> init model --task=creative</div>
+              <div class="sv-line sv-out"><span class="sv-green">✓</span> Dataset loaded — 12,400 samples</div>
+              <div class="sv-line sv-out">Training &nbsp;██████░░░░ 60%</div>
+              <div class="sv-line sv-out sv-blink-line">Generating output<span class="sv-cursor">_</span></div>
+              <div class="sv-line sv-out" style="opacity:0.45;">&gt; "the world AI represents everything"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill 02 · Short-video Director -->
+    <div class="skill-item skill-item-flip" data-index="1">
+      <div class="skill-item-left">
+        <div class="skill-im-a">I'M A</div>
+        <h2 class="skill-name-big">SHORT-VIDEO<br>DIRECTOR</h2>
+        <div class="skill-tag-zh">（短视频编导）</div>
+        <p class="skill-desc-line">爱拍一些莫名其妙的视频</p>
+        <div class="skill-big-num">02</div>
+      </div>
+      <div class="skill-item-right">
+        <div class="skill-visual">
+          <div class="sv-player">
+            <div class="sv-player-screen">
+              <div class="sv-rec-badge"><span class="sv-rec-dot"></span> REC</div>
+              <div class="sv-timecode">00:01:23:15</div>
+            </div>
+            <div class="sv-timeline">
+              <div class="sv-track sv-track-r"></div>
+              <div class="sv-track sv-track-g"></div>
+              <div class="sv-track sv-track-b"></div>
+              <div class="sv-playhead"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill 03 · Graphic Designer -->
+    <div class="skill-item" data-index="2">
+      <div class="skill-item-left">
+        <div class="skill-im-a">I'M A</div>
+        <h2 class="skill-name-big">GRAPHIC<br>DESIGNER</h2>
+        <div class="skill-tag-zh">（平面制作）</div>
+        <p class="skill-desc-line">爱做一些不拘一格的设计</p>
+        <div class="skill-big-num">03</div>
+      </div>
+      <div class="skill-item-right">
+        <div class="skill-visual">
+          <div class="sv-canvas">
+            <div class="sv-canvas-grid"></div>
+            <div class="sv-shape sv-circle"></div>
+            <div class="sv-shape sv-rect"></div>
+            <div class="sv-shape sv-tri"></div>
+            <div class="sv-palette">
+              <span style="background:var(--wkw-green)"></span>
+              <span style="background:var(--wkw-red)"></span>
+              <span style="background:var(--wkw-amber)"></span>
+              <span style="background:var(--cy-cyan)"></span>
+              <span style="background:var(--cy-magenta)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline Hero -->
+    <div class="skills-tagline-hero" aria-label="Tagline">
+      <div class="th-bg-marquees" aria-hidden="true">
+        <div class="th-mq-row th-mq-fwd"><span>CREATIVITY · IMAGINATION · DESIGN · AI · VISION · CRAFT ·&nbsp;</span><span>CREATIVITY · IMAGINATION · DESIGN · AI · VISION · CRAFT ·&nbsp;</span></div>
+        <div class="th-mq-row th-mq-rev"><span>EDGE RUNNER · CREATE · BUILD · IMAGINE · 创造力 · 想象力 ·&nbsp;</span><span>EDGE RUNNER · CREATE · BUILD · IMAGINE · 创造力 · 想象力 ·&nbsp;</span></div>
+        <div class="th-mq-row th-mq-fwd" style="animation-duration:26s"><span>CREATIVITY · IMAGINATION · DESIGN · AI · VISION · CRAFT ·&nbsp;</span><span>CREATIVITY · IMAGINATION · DESIGN · AI · VISION · CRAFT ·&nbsp;</span></div>
+      </div>
+      <div class="th-content">
+        <div class="th-line th-line-1">FULL OF CREATIVITY</div>
+        <div class="th-line th-line-2">ABLE TO <em class="th-em">IMAGINE</em></div>
+        <div class="th-line th-line-3"><span class="th-outline">READY</span> TO CREATE</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 6 · PORTFOLIO -->
+  <section id="portfolio" data-screen-label="Portfolio">
+    <div class="section-strip">&gt; SECT 06 / WORKS</div>
+    <div class="portfolio-title">
+      <div class="portfolio-title-en">/ Projects Eren<br>has contributed to</div>
+      <div class="portfolio-title-zh">Eren 参与制作过的账号</div>
+    </div>
+
+    <div class="portfolio-preview" id="portfolio-preview">
+      <div class="portfolio-preview-img" id="preview-img" style="padding:0;overflow:hidden;">
+        <img id="preview-actual-img" src="assets/proj-a.jpg" alt="" style="width:100%;height:100%;object-fit:contain;display:block;background:var(--bg-surface-1);">
+      </div>
+      <div class="portfolio-seal" id="preview-seal">01</div>
+    </div>
+
+    <div class="portfolio-list" id="portfolio-list">
+      <div class="portfolio-item" data-index="01" data-url="https://v.douyin.com/Yu6vaBC18tM/" data-img="assets/proj-a.jpg" tabindex="0">
+        <div class="portfolio-num">01</div>
+        <div class="portfolio-name">大静静的收包日常</div>
+        <div class="portfolio-arrow">→</div>
+      </div>
+      <div class="portfolio-item" data-index="02" data-url="https://v.douyin.com/fzla4xORGmg/" data-img="assets/proj-b.jpg" tabindex="0">
+        <div class="portfolio-num">02</div>
+        <div class="portfolio-name">于姐有个财税公司</div>
+        <div class="portfolio-arrow">→</div>
+      </div>
+      <div class="portfolio-item" data-index="03" data-url="https://v.douyin.com/kXfcyvab3cw/" data-img="assets/proj-c.jpg" tabindex="0">
+        <div class="portfolio-num">03</div>
+        <div class="portfolio-name">森维设计</div>
+        <div class="portfolio-arrow">→</div>
+      </div>
+      <div class="portfolio-item" data-index="04" data-url="https://v.douyin.com/z6A8NlNkLto/" data-img="assets/proj-d.jpg" tabindex="0">
+        <div class="portfolio-num">04</div>
+        <div class="portfolio-name">记住周淮</div>
+        <div class="portfolio-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 7 · VIDEOS -->
+  <section id="videos" data-screen-label="Videos">
+    <div class="section-strip">&gt; SECT 07 / VIDEO</div>
+    <div class="videos-header">
+      <h2 class="videos-title">
+        video<br>
+        <span class="slash">/</span> <span class="subtitle">get more video of Eren</span>
+      </h2>
+      <div class="videos-year">RECORDED: 2025</div>
+    </div>
+    <div class="video-deck" id="videos-deck">
+      <div class="video-card" data-src="assets/video1.mp4" data-title="Eren 作品集 01" tabindex="0">
+        <video class="video-bg" src="assets/video1.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 01</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频2.mp4" data-title="Eren 作品集 02" tabindex="0">
+        <video class="video-bg" src="uploads/视频2.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 02</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频3.mp4" data-title="Eren 作品集 03" tabindex="0">
+        <video class="video-bg" src="uploads/视频3.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 03</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频4.mp4" data-title="Eren 作品集 04" tabindex="0">
+        <video class="video-bg" src="uploads/视频4.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 04</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频5.mp4" data-title="Eren 作品集 05" tabindex="0">
+        <video class="video-bg" src="uploads/视频5.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 05</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频6.mp4" data-title="Eren 作品集 06" tabindex="0">
+        <video class="video-bg" src="uploads/视频6.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 06</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频7.mp4" data-title="Eren 作品集 07" tabindex="0">
+        <video class="video-bg" src="uploads/视频7.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 07</div>
+      </div>
+      <div class="video-card" data-src="uploads/视频8.mp4" data-title="Eren 作品集 08" tabindex="0">
+        <video class="video-bg" src="uploads/视频8.mp4" muted preload="metadata" playsinline loop
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.3);transition:filter 0.3s;"></video>
+        <div class="video-overlay"></div>
+        <div class="video-rec"><span style="width:6px;height:6px;border-radius:50%;background:var(--wkw-red);display:inline-block;animation:blink 1s step-end infinite;"></span> REC</div>
+        <div class="video-play-hint"><div class="video-play-btn">▶</div></div>
+        <div class="video-title">Eren 作品集 08</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 8 · FOOTER -->
+  <footer id="footer" data-screen-label="Footer">
+    <div class="section-strip">&gt; SECT 08 / CONTACT</div>
+    <div class="footer-section">
+      <div class="footer-row" data-delay="0">
+        <span class="footer-label">&gt; EMAIL</span>
+        <span class="footer-value">1976487027@qq.com</span>
+        <button class="copy-btn" data-copy="1976487027@qq.com">[ COPY ]</button>
+      </div>
+      <div class="footer-row" data-delay="1">
+        <span class="footer-label">&gt; TEL</span>
+        <span class="footer-value"><a href="tel:17606382975">17606382975</a></span>
+        <button class="copy-btn" data-copy="17606382975">[ COPY ]</button>
+      </div>
+      <div class="footer-row" data-delay="2">
+        <span class="footer-label">&gt; WECHAT</span>
+        <span class="footer-value">[ QR Code ▢ ]</span>
+        <button class="copy-btn" id="qr-show-btn">[ SHOW ]</button>
+      </div>
+    </div>
+
+    <hr class="footer-divider">
+
+    <div class="footer-bottom">
+      <div>
+        <span class="footer-eof" id="footer-eof">&gt; END OF FILM</span>
+        <div class="footer-good-night" id="good-night-msg">&gt; OK, GOOD NIGHT.</div>
+        <div class="footer-insomnia-msg">&gt; INSOMNIA_MODE ENABLED // 这个时间还醒着，欢迎</div>
+      </div>
+      <div>
+        <div class="footer-loop">
+          <span>LOOP? </span>
+          <span class="loop-y" id="loop-y">[Y]</span>
+          <span class="loop-n" id="loop-n">[N]</span>
+          <span style="color:var(--text-mute);">© 2025 EREN. ALL FRAMES RESERVED.</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /#site -->
+
+<script src="app.js"></script>
+</body>
+</html>

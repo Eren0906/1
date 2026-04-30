@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VISITOR LOG · EREN</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { min-height: 100vh; padding: 0; }
+    #site { opacity: 1; }
+
+    #vlog-wrap {
+      min-height: 100vh;
+      padding: 7rem 2.5rem 5rem;
+      max-width: 860px;
+    }
+
+    .vlog-topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex; align-items: center;
+      padding: 1.5rem 2.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    .vlog-back {
+      color: var(--text-secondary);
+      cursor: none;
+      transition: color 0.15s;
+      background: none; border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+    .vlog-back:hover { color: var(--wkw-green); }
+
+    .vlog-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cy-cyan);
+      text-shadow: 0 0 6px var(--cy-cyan);
+      margin-bottom: 3.5rem;
+      line-height: 2;
+    }
+
+    .vlog-entry-count { color: var(--wkw-green); }
+
+    /* ── FORM ── */
+    .vlog-form {
+      margin-bottom: 5rem;
+    }
+
+    .form-row {
+      display: flex; align-items: flex-start;
+      margin-bottom: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+    }
+
+    .form-prompt {
+      color: var(--text-mute);
+      width: 120px;
+      flex-shrink: 0;
+      padding-top: 0.15em;
+      transition: color 0.15s, text-shadow 0.15s;
+    }
+    .form-row:focus-within .form-prompt {
+      color: var(--wkw-green);
+      text-shadow: 0 0 6px var(--wkw-green);
+    }
+
+    .form-input {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--text-mute);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      padding: 0.15em 0.5em 0.15em;
+      outline: none;
+      transition: border-color 0.15s;
+      cursor: none;
+    }
+    .form-input:focus { border-color: var(--wkw-green); }
+    .form-input::placeholder { color: var(--text-mute); }
+
+    .form-textarea {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--text-mute);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      padding: 0.15em 0.5em;
+      outline: none;
+      resize: none;
+      min-height: 80px;
+      line-height: 1.8;
+      transition: border-color 0.15s;
+      cursor: none;
+    }
+    .form-textarea:focus { border-color: var(--wkw-green); }
+
+    .form-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--wkw-green);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    .form-submit-row {
+      display: flex; justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+
+    .submit-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--wkw-green);
+      background: none;
+      border: 1px solid var(--wkw-green);
+      padding: 0.5rem 1.5rem;
+      cursor: none;
+      letter-spacing: 0.1em;
+      transition: box-shadow 0.15s, background 0.15s;
+      box-shadow: 0 0 0 transparent;
+    }
+    .submit-btn:hover {
+      box-shadow: 0 0 12px var(--wkw-green);
+      background: rgba(61,255,143,0.05);
+    }
+
+    .form-error {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--wkw-red);
+      margin-top: 0.5rem;
+      min-height: 1.4em;
+      text-shadow: 0 0 4px var(--wkw-red);
+    }
+
+    .form-success {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--wkw-green);
+      margin-top: 0.5rem;
+      min-height: 1.4em;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .form-success.visible { opacity: 1; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+    .shake { animation: shake 0.2s ease; }
+
+    /* ── LOG LIST ── */
+    .vlog-divider {
+      border: none;
+      border-top: 1px solid var(--text-mute);
+      opacity: 0.3;
+      margin-bottom: 2.5rem;
+    }
+
+    .vlog-list-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-mute);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.1em;
+    }
+
+    #vlog-list { display: flex; flex-direction: column; gap: 0; }
+
+    .vlog-entry {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1.5rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(74,74,85,0.3);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      animation: fadeInEntry 0.4s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInEntry {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-meta { color: var(--text-mute); line-height: 1.8; }
+    .entry-who  { color: var(--text-secondary); }
+    .entry-msg  { color: var(--text-primary); line-height: 1.8; align-self: center; }
+
+    @media (max-width: 640px) {
+      #vlog-wrap { padding: 5rem 1.25rem 3rem; }
+      .vlog-entry { grid-template-columns: 1fr; gap: 0.25rem; }
+      .form-prompt { width: 80px; font-size: 12px; }
+      .form-input, .form-textarea { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="grain"></canvas>
+<div id="scanlines"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="cursor-label"></div>
+<div id="vhs-overlay"><span id="vhs-text">&gt; SWITCHING TAPE...</span></div>
+
+<div id="site">
+  <nav class="vlog-topbar">
+    <button class="vlog-back" id="back-btn">← BACK TO MAIN</button>
+  </nav>
+
+  <div id="vlog-wrap">
+    <div class="vlog-header">
+      <div>&gt; VISITOR_LOG.LOG</div>
+      <div>&gt; ENTRIES: <span class="vlog-entry-count" id="entry-count">247</span> &nbsp;&nbsp;&nbsp; LAST UPDATE: <span id="last-update">2026.04.29 03:14</span></div>
+    </div>
+
+    <form class="vlog-form" id="vlog-form" novalidate>
+      <div class="form-row">
+        <span class="form-prompt">&gt; NAME:</span>
+        <input class="form-input" id="f-name" type="text" placeholder="▮" autocomplete="off" maxlength="40" />
+      </div>
+      <div class="form-row">
+        <span class="form-prompt">&gt; FROM:</span>
+        <input class="form-input" id="f-from" type="text" placeholder="▮" autocomplete="off" maxlength="40" />
+      </div>
+      <div class="form-row" style="align-items:flex-start;">
+        <span class="form-prompt" style="padding-top:0.4em;">&gt; MESSAGE:</span>
+        <textarea class="form-textarea" id="f-msg" placeholder="▮" maxlength="300"></textarea>
+      </div>
+      <div class="form-error" id="form-error"></div>
+      <div class="form-success" id="form-success">&gt; ENTRY ADDED &nbsp; ✓</div>
+      <div class="form-submit-row">
+        <button type="submit" class="submit-btn">&gt; [SUBMIT]</button>
+      </div>
+    </form>
+
+    <hr class="vlog-divider">
+    <div class="vlog-list-header">// RECENT ENTRIES — SCROLL DOWN TO READ</div>
+    <div id="vlog-list"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── Grain
+  const canvas = document.querySelector('#grain');
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  function grain() {
+    const d = ctx.createImageData(canvas.width, canvas.height);
+    for (let i = 0; i < d.data.length; i+=4) {
+      const v = Math.random()*255|0;
+      d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255;
+    }
+    ctx.putImageData(d,0,0);
+  }
+  resize(); window.addEventListener('resize', resize);
+  setInterval(grain, 125);
+
+  // ── Cursor
+  const cur = document.querySelector('#cursor');
+  const ring = document.querySelector('#cursor-ring');
+  let mx=-100,my=-100,rx=-100,ry=-100;
+  document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+  (function tick(){ 
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+    rx+=(mx-rx)*0.18; ry+=(my-ry)*0.18;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(tick);
+  })();
+  document.addEventListener('mouseover', e=>{
+    ring.classList.toggle('active', !!e.target.closest('button,a,input,textarea,[tabindex]'));
+  });
+
+  // ── VHS back
+  async function vhsBack() {
+    const ov = document.querySelector('#vhs-overlay');
+    ov.style.transform='scaleY(1)'; ov.style.transition='transform 180ms ease'; ov.style.pointerEvents='all';
+    await new Promise(r=>setTimeout(r,280));
+    window.location.href='index.html';
+  }
+  document.querySelector('#back-btn').addEventListener('click', vhsBack);
+
+  // ── Seed / load entries
+  const SEED_ENTRIES = [
+    { ts: '2026.04.29 03:14:22', name: 'Lin', from: '上海', msg: '路过，喜欢你的设计 :)' },
+    { ts: '2026.04.29 02:55:11', name: '小李', from: '北京', msg: 'AI 这条路加油' },
+    { ts: '2026.04.28 23:40:08', name: 'Anonymous', from: '未知', msg: '...' },
+    { ts: '2026.04.28 22:17:33', name: 'Mia', from: '台北', msg: '凌晨三点的尖沙咀好有感觉' },
+    { ts: '2026.04.28 20:01:59', name: 'CK', from: '香港', msg: '王家卫 ×  赛博朋克，太妙了' },
+    { ts: '2026.04.27 19:45:00', name: 'Ray', from: '深圳', msg: '第一次看到这种风格的作品集，会再来的' },
+  ];
+
+  function loadEntries() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('eren_vlog') || '[]');
+      return [...stored, ...SEED_ENTRIES];
+    } catch { return [...SEED_ENTRIES]; }
+  }
+
+  function saveEntry(entry) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('eren_vlog') || '[]');
+      stored.unshift(entry);
+      localStorage.setItem('eren_vlog', JSON.stringify(stored.slice(0, 200)));
+    } catch {}
+  }
+
+  function renderEntry(entry, prepend = false) {
+    const el = document.createElement('div');
+    el.className = 'vlog-entry';
+    const who = entry.from ? `${entry.name} from ${entry.from}` : entry.name;
+    el.innerHTML = `
+      <div class="entry-meta">
+        <div>[${entry.ts}]</div>
+        <div class="entry-who">${escapeHtml(who)}</div>
+      </div>
+      <div class="entry-msg">${escapeHtml(entry.msg || '...')}</div>
+    `;
+    el.style.animationDelay = prepend ? '0ms' : Math.random()*200+'ms';
+    const list = document.querySelector('#vlog-list');
+    if (prepend) list.prepend(el);
+    else list.appendChild(el);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function badWord(s) {
+    const bad = ['fuck','shit','ass','bitch','操','草','傻','滚'];
+    return bad.some(w => s.toLowerCase().includes(w));
+  }
+
+  function nowTs() {
+    const n = new Date();
+    const p = x => String(x).padStart(2,'0');
+    return `${n.getFullYear()}.${p(n.getMonth()+1)}.${p(n.getDate())} ${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
+  }
+
+  // Render initial
+  const entries = loadEntries();
+  document.querySelector('#entry-count').textContent = 247 + (JSON.parse(localStorage.getItem('eren_vlog')||'[]').length);
+  entries.forEach(e => renderEntry(e));
+
+  // Update last-update
+  document.querySelector('#last-update').textContent = nowTs().replace(' ',' ');
+
+  // ── Form submit
+  const form = document.querySelector('#vlog-form');
+  const errEl = document.querySelector('#form-error');
+  const okEl = document.querySelector('#form-success');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = document.querySelector('#f-name').value.trim();
+    const from = document.querySelector('#f-from').value.trim();
+    const msg  = document.querySelector('#f-msg').value.trim();
+
+    // Validation
+    if (!name) {
+      errEl.textContent = '> ERROR: NAME REQUIRED';
+      form.classList.add('shake');
+      // 1-frame glitch
+      form.style.filter='hue-rotate(90deg)';
+      setTimeout(()=>{ form.style.filter='none'; form.classList.remove('shake'); },200);
+      return;
+    }
+    if (badWord(name+msg+from)) {
+      errEl.textContent = '> ERROR: INAPPROPRIATE CONTENT DETECTED';
+      form.classList.add('shake');
+      setTimeout(()=>form.classList.remove('shake'),200);
+      return;
+    }
+    errEl.textContent = '';
+
+    const entry = { ts: nowTs(), name, from: from||'Unknown', msg: msg||'...' };
+    saveEntry(entry);
+    renderEntry(entry, true);
+
+    // Update count
+    const stored = JSON.parse(localStorage.getItem('eren_vlog')||'[]');
+    document.querySelector('#entry-count').textContent = 247 + stored.length;
+
+    // Success feedback
+    okEl.classList.add('visible');
+    form.reset();
+    setTimeout(()=>okEl.classList.remove('visible'), 2000);
+  });
+
+})();
+</script>
+</body>
+</html>
