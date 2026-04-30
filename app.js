@@ -436,14 +436,19 @@
       preview.style.transform = 'translate(30px, -50%)';
     });
 
+    // Preload all project images so hovering is instant
+    items.forEach(item => {
+      if (item.dataset.img) { const pre = new Image(); pre.src = item.dataset.img; }
+    });
+
     items.forEach((item) => {
       item.addEventListener('mouseenter', () => {
         list.classList.add('has-hover');
         item.classList.add('hovered');
-        preview.classList.add('visible');
         const imgSrc = item.dataset.img || '';
         if (imgSrc) previewImg.src = imgSrc;
         previewSeal.textContent = item.dataset.index;
+        preview.classList.add('visible');
       });
       item.addEventListener('mouseleave', () => {
         list.classList.remove('has-hover');
